@@ -1,5 +1,7 @@
 # ARC-AI (AI Resource Capsule - Artificial Intelligence)
 
+<img width="1024" height="1024" alt="Logo" src="https://github.com/user-attachments/assets/d3db52f5-3113-4a27-97c9-bc78e16746ca" />
+
 [![Project Status](https://img.shields.io/badge/status-active%20development-green.svg)]()
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)]()
 [![Node.js](https://img.shields.io/badge/node.js-18+-green.svg)]()
