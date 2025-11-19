@@ -1,0 +1,22 @@
+# Mini Hub Configuration
+
+# MQTT Broker Settings
+# Use 'localhost' if Main Hub is on the same machine
+# Use IP address (e.g., 192.168.1.6) if Main Hub is on a different machine
+broker:
+  host: localhost  # Change this to your Main Hub's IP address if connecting over network
+  port: 1883
+
+# Mini Hub Identity
+mini_hub:
+  id: mini-01  # Unique identifier for this Mini Hub instance
+
+# Connection Settings
+connection:
+  timeout: 90  # Seconds to wait for response from Main Hub
+  keepalive: 60  # MQTT keepalive interval in seconds
+
+# Web Server Settings
+web:
+  port: 8080  # Port for the web interface
+

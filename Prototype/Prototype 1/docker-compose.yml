@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  network-sim:
+    build:
+      context: .
+      dockerfile: network_sim/Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      - NETWORK_SIM_LATENCY_MS=250
+      - NETWORK_SIM_PACKET_LOSS_PCT=5
+      - NETWORK_SIM_BANDWIDTH_BYTES_PER_SEC=1024
+      - NETWORK_SIM_MAX_CHUNK_SIZE_BYTES=800
+
+  main-hub:
+    build:
+      context: .
+      dockerfile: main_hub/Dockerfile
+    depends_on:
+      - network-sim
+    environment:
+      - MAIN_HUB_NODE_ID=main-hub
+      - MAIN_HUB_SQLITE_PATH=/data/main_hub.db
+      - MAIN_HUB_NETWORK_SIM_URL=http://network-sim:9000
+    volumes:
+      - mainhub-data:/data
+    ports:
+      - "8000:8000"
+
+  mini-hub-1:
+    build:
+      context: .
+      dockerfile: mini_hub/Dockerfile
+    depends_on:
+      - network-sim
+      - main-hub
+    environment:
+      - MINI_HUB_ID=mh1
+      - MINI_HUB_NETWORK_SIM_URL=http://network-sim:9000
+      - MINI_HUB_MAIN_HUB_URL=http://main-hub:8000
+      - MINI_HUB_SQLITE_PATH=/data/mini_hub.db
+    volumes:
+      - minihub1-data:/data
+    ports:
+      - "8101:8000"
+
+  mini-hub-2:
+    build:
+      context: .
+      dockerfile: mini_hub/Dockerfile
+    depends_on:
+      - network-sim
+      - main-hub
+    environment:
+      - MINI_HUB_ID=mh2
+      - MINI_HUB_NETWORK_SIM_URL=http://network-sim:9000
+      - MINI_HUB_MAIN_HUB_URL=http://main-hub:8000
+      - MINI_HUB_SQLITE_PATH=/data/mini_hub.db
+    volumes:
+      - minihub2-data:/data
+    ports:
+      - "8102:8000"
+
+  mini-hub-3:
+    build:
+      context: .
+      dockerfile: mini_hub/Dockerfile
+    depends_on:
+      - network-sim
+      - main-hub
+    environment:
+      - MINI_HUB_ID=mh3
+      - MINI_HUB_NETWORK_SIM_URL=http://network-sim:9000
+      - MINI_HUB_MAIN_HUB_URL=http://main-hub:8000
+      - MINI_HUB_SQLITE_PATH=/data/mini_hub.db
+    volumes:
+      - minihub3-data:/data
+    ports:
+      - "8103:8000"
+
+volumes:
+  mainhub-data:
+  minihub1-data:
+  minihub2-data:
+  minihub3-data:
+

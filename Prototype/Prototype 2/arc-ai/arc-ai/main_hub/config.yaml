@@ -1,0 +1,22 @@
+# Main Hub Configuration
+
+# MQTT Broker Settings
+broker:
+  host: localhost  # Use 'localhost' for local connection, or your IP (e.g., 192.168.1.6) for network access
+  port: 1883
+
+# Ollama LLM Configuration
+ollama:
+  base_url: http://localhost:11434  # Ollama API base URL
+  model: mistral:7b  # Model name (must be downloaded in Ollama)
+  max_retries: 3  # Number of retry attempts for failed requests
+  retry_delay: 1.0  # Delay between retries in seconds
+
+# System prompt for LLM
+system_prompt: "You are a helpful AI assistant. Provide clear, accurate, and detailed answers to user questions. For complex or big questions, provide comprehensive explanations with examples when appropriate."
+
+# Timeouts and Quality of Service
+timeouts:
+  llm_timeout: 60   # Seconds to wait for LLM generation (1 minute - faster response)
+  mqtt_qos: 1       # MQTT Quality of Service (0, 1, or 2)
+

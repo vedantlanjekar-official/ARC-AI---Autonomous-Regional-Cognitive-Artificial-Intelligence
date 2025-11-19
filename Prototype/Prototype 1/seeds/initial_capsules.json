@@ -1,0 +1,13 @@
+[
+  {
+    "capsule_id": "00000000000000000000000000000000",
+    "question_hash": "stub",
+    "question_text": "Placeholder capsule seeded during scaffold.",
+    "answer_text": "This will be replaced by real seeded data.",
+    "compressed_embedding": null,
+    "source_id": "main-hub",
+    "timestamp": "2024-01-01T00:00:00Z",
+    "signature": "stub"
+  }
+]
+

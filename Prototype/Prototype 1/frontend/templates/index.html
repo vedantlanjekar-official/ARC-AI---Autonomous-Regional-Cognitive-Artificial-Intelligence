@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <h1>Resilient Knowledge Transport for Connected Teams</h1>
+        <p>
+            Experience ARC-AI’s decentralized messaging prototype. Messages travel through the
+            simulated network, relying on encrypted capsules, main hub governance, and mini hub caches.
+        </p>
+        <div class="hero-actions">
+            <a class="btn primary" href="/login">Sign In</a>
+            <a class="btn secondary" href="/dashboard">Open Dashboard</a>
+        </div>
+    </div>
+    <div class="hero-graphic">
+        <div class="pulse"></div>
+        <div class="pulse delay"></div>
+    </div>
+</section>
+<section class="features">
+    <div class="feature">
+        <h3>Secure Transit</h3>
+        <p>End-to-end encryption with authenticated capsules ensures only trusted hubs can unwrap content.</p>
+    </div>
+    <div class="feature">
+        <h3>Network Simulation</h3>
+        <p>Latency, packet loss, and retransmissions are modeled to capture real-world edge conditions.</p>
+    </div>
+    <div class="feature">
+        <h3>Mini Hub Resilience</h3>
+        <p>Mini hubs queue outgoing packets and reconcile authoritative responses once connectivity restores.</p>
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card dashboard-header">
+    <div>
+        <h2>Welcome back, {{ username }}!</h2>
+        <p class="muted">Messages relay through your mini hub to the main hub and onward to peers.</p>
+    </div>
+    <a class="btn secondary" href="/logout">Log out</a>
+</section>
+
+<section class="dashboard-grid">
+    <div class="card">
+        <h3>Send Message</h3>
+        <form id="message-form" class="form">
+            <label for="recipient">Recipient ID</label>
+            <input id="recipient" name="recipient" type="text" placeholder="recipient-id" required>
+
+            <label for="targetHub">Target Mini Hub (optional)</label>
+            <input id="targetHub" name="targetHub" type="text" placeholder="mh1, mh2, ...">
+
+            <label for="content">Message</label>
+            <textarea id="content" name="content" rows="4" placeholder="Type a secure message..." required></textarea>
+
+            <button class="btn primary" type="submit">Send</button>
+            <p id="form-status" class="muted"></p>
+        </form>
+    </div>
+    <div class="card messages">
+        <header class="messages-header">
+            <h3>Inbox</h3>
+            <button class="btn tertiary" id="refresh-btn">Refresh</button>
+        </header>
+        <div id="inbox-list" class="message-list"></div>
+    </div>
+    <div class="card messages wide">
+        <header class="messages-header">
+            <h3>Sent</h3>
+        </header>
+        <div id="sent-list" class="message-list"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const miniHubUrl = {{ mini_hub_url | tojson }};
+const username = {{ username | tojson }};
+
+async function fetchJson(url, options = {}) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+    return await response.json();
+}
+
+function renderMessages(container, messages, emptyCopy) {
+    if (!messages.length) {
+        container.innerHTML = `<p class="muted">${emptyCopy}</p>`;
+        return;
+    }
+    container.innerHTML = messages.map(msg => `
+        <article class="message">
+            <div class="message-meta">
+                <span><strong>From:</strong> ${msg.sender_id}</span>
+                ${msg.recipient_id ? `<span><strong>To:</strong> ${msg.recipient_id}</span>` : ""}
+            </div>
+            <p>${msg.content}</p>
+            <footer>
+                <span>${new Date(msg.timestamp).toLocaleString()}</span>
+                <span class="badge">${msg.direction}</span>
+            </footer>
+        </article>
+    `).join("");
+}
+
+async function loadMessages() {
+    try {
+        const inbox = await fetchJson(`${miniHubUrl}/messages/inbox?user_id=${encodeURIComponent(username)}`);
+        renderMessages(document.getElementById("inbox-list"), inbox.messages, "No messages received yet.");
+
+        const sent = await fetchJson(`${miniHubUrl}/messages/sent?user_id=${encodeURIComponent(username)}`);
+        renderMessages(document.getElementById("sent-list"), sent.messages, "No messages sent yet.");
+    } catch (err) {
+        console.error(err);
+        document.getElementById("form-status").textContent = "Unable to load messages. Check connectivity.";
+    }
+}
+
+document.getElementById("message-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const statusEl = document.getElementById("form-status");
+    statusEl.textContent = "Sending…";
+
+    const payload = {
+        sender_id: username,
+        recipient_id: document.getElementById("recipient").value,
+        target_hub_id: document.getElementById("targetHub").value || null,
+        content: document.getElementById("content").value,
+    };
+
+    try {
+        const response = await fetchJson(`${miniHubUrl}/messages/send`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload),
+        });
+        statusEl.textContent = `Message ${response.status}.`;
+        document.getElementById("content").value = "";
+        await loadMessages();
+    } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Failed to send message. Please retry.";
+    }
+});
+
+document.getElementById("refresh-btn").addEventListener("click", loadMessages);
+
+loadMessages();
+setInterval(loadMessages, 15000);
+</script>
+{% endblock %}
+

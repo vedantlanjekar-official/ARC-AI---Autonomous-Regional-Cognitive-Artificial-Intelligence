@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Mini Hub Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Mini Hub Web Connection</h1>
+    
+    <div>
+        <label>Mini Hub URL: </label>
+        <input type="text" id="urlInput" value="http://192.168.1.6:8080" placeholder="http://192.168.1.6:8080">
+        <button onclick="testConnection()">Test Connection</button>
+    </div>
+    
+    <div id="status"></div>
+    <div id="result"></div>
+    
+    <script>
+        async function testConnection() {
+            const url = document.getElementById('urlInput').value.trim();
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+            
+            if (!url) {
+                statusDiv.innerHTML = '<div class="status error">Please enter a URL</div>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<div class="status">Testing connection...</div>';
+            resultDiv.innerHTML = '';
+            
+            try {
+                // Test health endpoint
+                const healthUrl = url.replace(/\/$/, '') + '/health';
+                console.log('Testing:', healthUrl);
+                
+                const response = await fetch(healthUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                statusDiv.innerHTML = '<div class="status success">✓ Connection Successful!</div>';
+                resultDiv.innerHTML = `
+                    <h3>Health Check Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    
+                    <h3>Test API Call:</h3>
+                    <button onclick="testAPI('${url}')">Test /ask endpoint</button>
+                    <div id="apiResult"></div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">✗ Connection Failed: ${error.message}</div>`;
+                resultDiv.innerHTML = `
+                    <h3>Error Details:</h3>
+                    <pre>${error.stack || error.toString()}</pre>
+                    <p><strong>Possible issues:</strong></p>
+                    <ul>
+                        <li>Check if the URL is correct (should be http://IP:8080)</li>
+                        <li>Make sure both devices are on the same network</li>
+                        <li>Check firewall settings</li>
+                        <li>Verify the Mini Hub server is running</li>
+                    </ul>
+                `;
+            }
+        }
+        
+        async function testAPI(url) {
+            const apiResultDiv = document.getElementById('apiResult');
+            apiResultDiv.innerHTML = 'Sending test question...';
+            
+            try {
+                const response = await fetch(url.replace(/\/$/, '') + '/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: 'Hello, this is a test' })
+                });
+                
+                const data = await response.json();
+                apiResultDiv.innerHTML = `
+                    <div class="status success">API Test Successful!</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                apiResultDiv.innerHTML = `
+                    <div class="status error">API Test Failed: ${error.message}</div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+

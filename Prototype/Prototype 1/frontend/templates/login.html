@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>Sign in to ARC-AI</h2>
+    <p class="muted">Choose a display name to join the messaging network.</p>
+    <form action="/login" method="post" class="form">
+        <label for="username">Display Name</label>
+        <input id="username" name="username" type="text" placeholder="e.g. analyst-42" required>
+        <button class="btn primary" type="submit">Continue</button>
+    </form>
+</section>
+{% endblock %}
+
